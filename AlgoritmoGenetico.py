@@ -41,7 +41,7 @@ def calcula_aptidao(matriz):
     global vet_aptidao
     global distanciaCidades
 
-    matrixTemp = copy.copy((matriz))
+    matrixTemp = copy.deepcopy(matriz)
     for i in range(0, 20):
         aux = matrixTemp[i][0]
         matrixTemp[i].append(aux)
@@ -66,10 +66,11 @@ def ordena_matrixcromo_vetapt_dist():
     inds = aptidoes.argsort()
     #usando os indices ordenados, criamos uma matriz e um vetor ordenados
     matrizOrdenada = matriz[inds]
+
     aptidoesOrdenadas = aptidoes[inds]
     #substituimos a matriz
-    matrix_cromossomos = matrizOrdenada
-    vet_aptidao = aptidoesOrdenadas
+    matrix_cromossomos = matrizOrdenada.tolist()
+    vet_aptidao = aptidoesOrdenadas.tolist()
 
 
 def escolhe_pais():
@@ -183,7 +184,7 @@ if __name__  == '__main__':
     printaMatriz(matrix_cromossomos)
     print('**********')
     interacoes = 0
-    while interacoes <= 10000:
+    while interacoes < 1000:
         calcula_aptidao(matrix_cromossomos)
         ordena_matrixcromo_vetapt_dist()
         escolhe_pais()

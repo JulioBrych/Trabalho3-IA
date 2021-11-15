@@ -2,14 +2,12 @@ import copy
 import math
 import random
 import numpy
+import matplotlib
+from matplotlib import pyplot as plt
 
-def printaMatriz(matriz):
+def printa_matriz(matriz):
     for i in range(0, len(matriz)):
         print(matriz[i])
-
-
-
-
 
 def calcula_distancias_cidades():
     global distancia_cidades
@@ -19,13 +17,7 @@ def calcula_distancias_cidades():
             vet_temp.append(calcula_distancia_euclidiana(i, j))
         distanciaCidades.append(vet_temp)
 
-
-def ordenaTudo():
-    global matrix_cromossomos
-    global vet_aptidao
-
-
-def geraPrimeiraGeracao():
+def gera_primeira_geracao():
     global matrix_cromossomos
     for i in range(0, 20):
         #preenche a matriz de cromossomos com valores de 0 a 20 sem repeticoes
@@ -35,7 +27,6 @@ def geraPrimeiraGeracao():
 def calcula_distancia_euclidiana(ini, des):
     global mapa
     return math.sqrt(((mapa[des][0]-mapa[ini][0])**2)+((mapa[des][1]-mapa[ini][1])**2))
-
 
 def calcula_aptidao(matriz):
     global vet_aptidao
@@ -83,8 +74,8 @@ def escolhe_pais():
     while (len(listaPai1) < 5):
         # gera um valor aleatorio, para pegar um pai da roleta
         aux = random.randint(0,54)
-        # verifica se esse pai escolhido n esta na primeira lista
-        #garantindo que as lista n possuam pais iguais
+        # verifica se esse pai escolhido nao esta na primeira lista
+        #garantindo que as lista nao possuam pais iguais
         if not vet_roleta[aux] in listaPai1:
             listaPai1.append(vet_roleta[aux])
             listaPai2.remove(vet_roleta[aux])
@@ -110,8 +101,8 @@ def gera_filhos():
         valorTroca = filho1[indice]
         filho1[indice] = filho2[indice]
         filho2[indice] = valorTroca
-        while (len(filho1) != len(set(filho1))):
-            indice = verifica_repitido(filho1,indice)
+        while (len(filho1) != len(set(filho1))): # repete ate nao haver mais numeros duplicados
+            indice = verifica_repetido(filho1,indice)
             valorTroca = filho1[indice]
             filho1[indice] = filho2[indice]
             filho2[indice] = valorTroca
@@ -121,20 +112,20 @@ def gera_filhos():
     for i in range(10, 20):
         matrix_cromossomos[i] = listaNovosFilhos[i-10]
     print('Matriz com novos filhos')
-    printaMatriz(matrix_cromossomos)
+    printa_matriz(matrix_cromossomos)
 
 
-def verifica_repitido(filho1,indice):
+def verifica_repetido(filho1,indice):
     #função usada para pegar o indice do proximo cromossomo a ser trocado
     #pega o ultimo cromossomo que foi trocado
     valor = filho1[indice]
-    #vare a lista de cromossomos
+    #varre a lista de cromossomos
     for i in range(0,20):
-        # caso o filho1 possua o ultimo valor trocado e esse n esteja na mesma posição do indice recebido
-        # é nessa posição em que tera que ser feita a procima troca de cromossomo
+        # caso o filho1 possua o ultimo valor trocado e esse nao esteja na mesma posição do indice recebido
+        # é nessa posição em que tera que ser feita a proxima troca de cromossomo
         if filho1[i] == valor and i != indice:
             return i
-    # caso n possua nenhum cromossomo a ser trocado retorna -1
+    # caso nao possua nenhum cromossomo a ser trocado retorna -1
     return -1
 
 
@@ -154,6 +145,47 @@ def mutacao():
             matrix_cromossomos[i][indice1] = matrix_cromossomos[i][indice2]
             matrix_cromossomos[i][indice2] = valor
 
+def imprime_solucao():
+    global matrix_cromossomos
+    global vet_aptidao
+
+    x = len(matrix_cromossomos)
+    taxaMutacao = 0.05;
+    numCidades = 20;
+    melhorCusto = vet_aptidao[0]
+    melhorSolucao = matrix_cromossomos[0]
+    print("Tamanho da populacao: ", x)
+    print("Taxa de mutacao: ", taxaMutacao)
+    print("Numero de cidades: ", numCidades)
+    print("Melhor custo: ", melhorCusto)
+    print("Melhor solucao: ", melhorSolucao)
+
+
+def funcao_plot(caminhos, pontos):
+
+    x = []
+    y = []
+    for i in caminhos[0]:
+        x.append(pontos[i][0])
+        y.append(pontos[i][1])
+
+    for i in range(0, 20):
+        plt.plot(x[i], y[i], 'co', marker="${}$".format(caminhos[0][i]), markersize=17)
+
+    # Tamanho da seta
+    tam_seta = float(max(x)) / float(100)
+
+    # Desenho dos caminhos
+    plt.arrow(x[-1], y[-1], (x[0] - x[-1]), (y[0] - y[-1]), head_width=tam_seta,
+              color='g', length_includes_head=True)
+    for i in range(0, len(x) - 1):
+        plt.arrow(x[i], y[i], (x[i + 1] - x[i]), (y[i + 1] - y[i]), head_width=tam_seta,
+        color='g', length_includes_head=True)
+
+    # alterando limites das coordenadas
+    plt.xlim(0, max(x) * 1.1)
+    plt.ylim(0, max(y) * 1.1)
+    plt.show()
 
 if __name__  == '__main__':
     mapa = [[0.77687122244663642, 0.27943919986108079], [0.5572653296455039, 0.11661366329340583],
@@ -171,17 +203,16 @@ if __name__  == '__main__':
             [0.67595096782693853, 0.99033329254439939], [0.074297051769727118, 0.15694231625653665]]
 
     distanciaCidades = []
-    vet_roleta = [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,8,8,9] #55 numeros
+    vet_roleta = [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,8,8,9] #55 numeros, distribuidos para as chances da roleta
     matrix_cromossomos = []
     vet_aptidao = []
     listaPai1 = []
     listaPai2 = []
 
-
     calcula_distancias_cidades()
-    geraPrimeiraGeracao()
+    gera_primeira_geracao()
     print('----------primeira matriz gerada------------')
-    printaMatriz(matrix_cromossomos)
+    printa_matriz(matrix_cromossomos)
     print('**********')
     interacoes = 0
     while interacoes < 1000:
@@ -192,4 +223,25 @@ if __name__  == '__main__':
         mutacao()
         interacoes += 1
 
+    #ordena os cromossomos e aptidoes e imprime a solucao
     ordena_matrixcromo_vetapt_dist()
+    imprime_solucao()
+
+   # coordenadas para os pontos x e y da função plot
+    coord_x = [1, 8, 4, 9, 1, 1, 8, 2, 16, 8, 18, 13, 2, 3, 13, 15, 14, 3, 16, 10]
+    coord_y = [1, 2, 3, 4, 9, 5, 7, 9, 8, 6, 10, 9, 11, 2, 1, 13, 7, 10, 3, 18]
+    pontos = []
+    for i in range(0, len(coord_x)):
+        pontos.append((coord_x[i], coord_y[i]))
+
+    #caminhos abaixo somente para testes, caminho principal vem da matrix_cromossomos
+
+    caminho1 = [14, 18, 8, 9, 0, 12, 2, 15, 13, 4, 6, 17, 5, 7, 1, 10, 11, 19, 16, 3]
+
+    caminho2 = [16, 6, 17, 10, 5, 0, 12, 9, 8, 18, 14, 3, 1, 7, 11, 19, 4, 13, 15, 2]
+
+    caminhos = [matrix_cromossomos[0],caminho2]
+
+
+    # solucao graficamente
+    funcao_plot(caminhos, pontos)

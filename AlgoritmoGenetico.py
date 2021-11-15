@@ -5,6 +5,8 @@ import numpy
 import matplotlib
 from matplotlib import pyplot as plt
 
+#Equipe: Julio Vicente Brych, Martha Lanser Bloemer, Guilherme Fibrantz
+
 def printa_matriz(matriz):
     for i in range(0, len(matriz)):
         print(matriz[i])
